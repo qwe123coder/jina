@@ -460,6 +460,7 @@ class Flow(PostMixin, JAMLCompatible, ExitStack, metaclass=FlowType):
     @overload
     def add(
         self,
+        *args,
         connect_to_predecessor: Optional[bool] = False,
         ctrl_with_ipc: Optional[bool] = False,
         daemon: Optional[bool] = False,
@@ -635,6 +636,7 @@ class Flow(PostMixin, JAMLCompatible, ExitStack, metaclass=FlowType):
     @allowed_levels([FlowBuildLevel.EMPTY])
     def add(
         self,
+        *args,
         needs: Optional[Union[str, Tuple[str], List[str]]] = None,
         copy_flow: bool = True,
         pod_role: 'PodRoleType' = PodRoleType.POD,
@@ -645,6 +647,7 @@ class Flow(PostMixin, JAMLCompatible, ExitStack, metaclass=FlowType):
         The attribute of the Pod can be later changed with :py:meth:`set` or deleted with :py:meth:`remove`
 
         .. # noqa: DAR401
+        :param args: additional positional arguments which are just used for sanity check.
         :param needs: the name of the Pod(s) that this Pod receives data from.
                            One can also use 'gateway' to indicate the connection with the gateway.
         :param pod_role: the role of the Pod, used for visualization and route planning
@@ -652,6 +655,11 @@ class Flow(PostMixin, JAMLCompatible, ExitStack, metaclass=FlowType):
         :param kwargs: other keyword-value arguments that the Pod CLI supports
         :return: a (new) Flow object with modification
         """
+
+        if len(args) > 0:
+            raise ValueError(
+                f'positional arguments {args} are not accepted, please pass keyword-value arguments '
+            )
 
         op_flow = copy.deepcopy(self) if copy_flow else self
 
